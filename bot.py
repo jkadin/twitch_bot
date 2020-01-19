@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+POLL_MODS = ['zinge']
+
+
 class Bot(commands.Bot):
     def __init__(self):
         self.poll = None
@@ -42,6 +45,9 @@ class Bot(commands.Bot):
 
     @commands.command(name='new')
     async def new_poll(self, ctx, *, args):
+        if not ctx.author.is_mod or ctx.author.name in POLL_MODS:
+            await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
+            return
         if self.poll is not None:
             await ctx.send('There is an existing poll. Use "!poll end" to get results before starting a new one.')
             return
@@ -60,6 +66,9 @@ class Bot(commands.Bot):
 
     @commands.command(name='end')
     async def end_poll(self, ctx):
+        if not ctx.author.is_mod or not ctx.author.name in POLL_MODS:
+            await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
+            return
         if self.poll is not None:
             total_votes = len(list(chain.from_iterable(self.poll['options'].values())))
             formatted_options = [f"{o} ({len(users)/total_votes*100}%)" for o, users in (self.poll['options'].items())]
