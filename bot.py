@@ -66,7 +66,7 @@ class Bot(commands.Bot):
 
     @commands.command(name='end')
     async def end_poll(self, ctx):
-        if not ctx.author.is_mod or not ctx.author.name in POLL_MODS:
+        if not ctx.author.is_mod and not ctx.author.name in POLL_MODS:
             await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
             return
         if self.poll is not None:
