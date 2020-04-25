@@ -12,6 +12,7 @@ POLL_MODS = ['zinge']
 class Bot(commands.Bot):
     def __init__(self):
         self.poll = None
+        self.stats = {}
         super().__init__(irc_token=os.getenv('TMI_TOKEN'),
                         client_id=os.getenv('CLIENT_ID'),
                         nick=os.getenv('BOT_NICK'),
@@ -81,6 +82,24 @@ class Bot(commands.Bot):
     async def help_poll(self, ctx):
         cmd_prefix = os.getenv('BOT_PREFIX')
         await ctx.send(f'"{cmd_prefix} new TITLE | OPTION 1 | OPTION 2" to start a poll  --  "{cmd_prefix}" to check the results on an existing poll  --  "{cmd_prefix} end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
+
+    @commands.command(name='dsdeaths')
+    async def dsdeaths(self, ctx, *, args):
+        if not "dsdeaths" in self.stats:
+            self.stats["dsdeaths"] = 0
+        if "help" in args:
+            await ctx.send('Temporary Dark Soul Death Commands: !ppoll dsdeaths | !ppoll dsdeaths add/subtract | !ppoll dsdeaths set 10')
+            return
+        elif "add" in args:
+            self.stats["dsdeaths"] += 1
+        elif "subtract" in args:
+            if self.stats["dsdeaths"] > 0:
+                self.stats["dsdeaths"] -= 1
+        elif "set" in args:
+            deaths = int(args.split()[-1])
+            if deaths >= 0:
+                self.stats["dsdeaths"] = deaths
+        await ctx.send('Pitr has died {} times in Dark Souls.'.format(self.stats["dsdeaths"]))
 
 
 if __name__ == "__main__":
