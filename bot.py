@@ -84,7 +84,7 @@ class Bot(commands.Bot):
         await ctx.send(f'"{cmd_prefix} new TITLE | OPTION 1 | OPTION 2" to start a poll  --  "{cmd_prefix}" to check the results on an existing poll  --  "{cmd_prefix} end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
 
     @commands.command(name='dsdeaths')
-    async def dsdeaths(self, ctx, *, args):
+    async def dsdeaths(self, ctx, *, args=""):
         if not "dsdeaths" in self.stats:
             self.stats["dsdeaths"] = 0
         if "help" in args:
