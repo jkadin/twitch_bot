@@ -1,4 +1,5 @@
 import os
+import datetime
 from itertools import chain
 from twitchio.ext import commands
 from dotenv import load_dotenv
@@ -85,21 +86,27 @@ class Bot(commands.Bot):
 
     @commands.command(name='dsdeaths')
     async def dsdeaths(self, ctx, *, args=""):
+        time_since_death = None
         if not "dsdeaths" in self.stats:
-            self.stats["dsdeaths"] = 0
+            self.stats["dsdeaths"] = [0, datetime.datetime.now()]
         if "help" in args:
             await ctx.send('Temporary Dark Soul Death Commands: !ppoll dsdeaths | !ppoll dsdeaths add/subtract | !ppoll dsdeaths set 10')
             return
         elif "add" in args:
-            self.stats["dsdeaths"] += 1
+            self.stats["dsdeaths"][0] += 1
+            time_since_death = datetime.datetime.now() - self.stats["dsdeaths"][1]
+            self.stats["dsdeaths"][1] = datetime.datetime.now()
         elif "subtract" in args:
-            if self.stats["dsdeaths"] > 0:
-                self.stats["dsdeaths"] -= 1
+            if self.stats["dsdeaths"][0] > 0:
+                self.stats["dsdeaths"][0] -= 1
         elif "set" in args:
             deaths = int(args.split()[-1])
             if deaths >= 0:
-                self.stats["dsdeaths"] = deaths
-        await ctx.send('Pitr has died {} times in Dark Souls.'.format(self.stats["dsdeaths"]))
+                self.stats["dsdeaths"][0] = deaths
+        msg = "Pitr has died {} times in Dark Souls.".format(self.stats["dsdeaths"][0])
+        if time_since_death:
+            msg += " It's been ~{} minutes since his last death.".format(int(time_since_death.total_seconds() / 60))
+        await ctx.send(msg)
 
 
 if __name__ == "__main__":
