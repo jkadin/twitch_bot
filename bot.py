@@ -20,6 +20,12 @@ class Bot(commands.Bot):
                         prefix=os.getenv('BOT_PREFIX'),
                         initial_channels=[])
 
+    def get_poll_results(self):
+        total_votes = len(list(chain.from_iterable(self.poll['options'].values())))
+        poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)" for o, users in (self.poll['options'].items())]
+        return poll_results
+
+
     # Events don't need decorators when subclassed
     async def event_ready(self):
         print(f'Ready | {self.nick}')
@@ -38,9 +44,8 @@ class Bot(commands.Bot):
                             await message.channel.send(f"{message.author.name} already voted in this poll")
             elif message.content == os.getenv('BOT_PREFIX'):
                 if self.poll is not None:
-                    total_votes = len(list(chain.from_iterable(self.poll['options'].values())))
-                    formatted_options = [f"{o} ({len(users)/total_votes*100}%)" for o, users in (self.poll['options'].items())]
-                    await message.channel.send(f"Current results: {self.poll['title']} - {' / '.join(formatted_options)}")
+                    poll_results = self.get_poll_results()
+                    await message.channel.send(f"Current results: {self.poll['title']} - {' / '.join(poll_results)}")
                 else:
                     await message.channel.send('There is no current poll. Use "!poll new TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
         await self.handle_commands(message)
@@ -72,9 +77,8 @@ class Bot(commands.Bot):
             await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
             return
         if self.poll is not None:
-            total_votes = len(list(chain.from_iterable(self.poll['options'].values())))
-            formatted_options = [f"{o} ({len(users)/total_votes*100}%)" for o, users in (self.poll['options'].items())]
-            await ctx.send(f"Final results: {self.poll['title']} - {' / '.join(formatted_options)}")
+            poll_results = self.get_poll_results()
+            await ctx.send(f"Final results: {self.poll['title']} - {' / '.join(poll_results)}")
             self.poll = None
         else:
             await ctx.send('There is no current poll. Use "!poll new TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
