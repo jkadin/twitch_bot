@@ -1,0 +1,74 @@
+{% extends 'pitrcade/base.html' %}
+{% load static %}
+
+{% block title %}{{ game_title }}{% endblock %}
+
+{% block extra_css %}
+{# Using embedded stylesheet to allow static template tag for url src #}
+<style>
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Press Start 2P Regular'),
+       local('PressStart2P-Regular'),
+       url('{% static 'pitrcade/fonts/PressStart2P.woff2' %}') format('woff2'),
+       url('{% static 'pitrcade/fonts/PressStart2P.woff' %}') format('woff'),
+       url('{% static 'pitrcade/fonts/PressStart2P.ttf' %}') format('truetype');
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'pitrcade/css/scoreboard.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class='text-center'>
+<br>
+<h3>{{ game_title }}</h3>
+<br>
+<br>
+<h1>High Scores</h1>
+<br>
+<div id='player_list_container'></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pitrcade/js/typed/typed.min.js' %}"></script>
+<script>
+function update_scoreboard(player_list, refresh_ms) {
+    var high_scores_html = "";
+    $('#player_list_container').html("<span id='player_list'></span>")
+    $.each( player_list, function( i, player ) {
+        player_data = (i+1) + '. ' + player.fields.username + " - " + player.fields.score;
+        high_scores_html += '<h2>' + player_data + '</h2>^500\n'
+    });
+    typed = new Typed('#player_list', {
+          strings: [high_scores_html, ''],
+          typeSpeed: 80,
+          backSpeed: 40,
+          backDelay: refresh_ms,
+          showCursor: false,
+          onComplete: function(){
+              $('#player_list_container').html('');
+              get_scores();
+          },
+    });
+};
+
+function get_scores() {
+    $.ajax({
+      url: 'scoreboard',
+      cache: false,
+      success: function(player_list){
+        update_scoreboard(player_list, refresh_ms);
+      },
+    });
+};
+
+var refresh_secs = parseInt({{ scoreboard_refresh|safe }});
+var refresh_ms = refresh_secs * 1000
+var typed = null;
+get_scores(refresh_ms);
+
+</script>
+{% endblock %}

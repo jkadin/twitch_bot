@@ -1,0 +1,27 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'pitrcade/css/bootstrap/bootstrap.min.css' %}" />
+    {% block extra_css %}
+    {% endblock %}
+
+    <title>{% block title %}{{ game_title }}{% endblock %}</title>
+  </head>
+  <body>
+      {% block content %}
+      {% endblock %}
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="{% static 'pitrcade/js/jquery/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'pitrcade/js/popper/popper.min.js' %}"></script>
+    <script src="{% static 'pitrcade/js/bootstrap/bootstrap.min.js' %}"></script>
+    {% block extra_js %}
+    {% endblock %}
+  </body>
+</html>
