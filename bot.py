@@ -1,5 +1,6 @@
 import os
 import datetime
+import re
 from itertools import chain
 from twitchio.ext import commands
 from dotenv import load_dotenv
@@ -33,7 +34,13 @@ class Bot(commands.Bot):
         print(f"Joined channel {os.getenv('CHANNEL')}")
 
     async def event_message(self, message):
+        #Ignore messages from the bot
         if not message.author.name == self.nick.lower():
+            #Check for bits for Pitrcade
+            message_without_content = message.raw_data.split("PRIVMSG")[0]
+            matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
+            if matcher and int(matcher.group("bits")) == 25:
+                await message.channel.send(f"{message.author.name} dropped a quarter in the Pitrcade!")
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
