@@ -1,12 +1,17 @@
 import os
+import sys
 import datetime
 import re
 from itertools import chain
 from twitchio.ext import commands
 from dotenv import load_dotenv
-
 load_dotenv()
 
+sys.path.append("pitrcade_django")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pollerbot.settings")
+import django
+django.setup()
+from pitrcade.models import Player
 
 POLL_MODS = ['zinge']
 
@@ -38,9 +43,13 @@ class Bot(commands.Bot):
         if not message.author.name == self.nick.lower():
             #Check for bits for Pitrcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
+            ## DEBUG
+            # message_without_content = message.raw_data
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
             if matcher and int(matcher.group("bits")) == 25:
-                await message.channel.send(f"{message.author.name} dropped a quarter in the Pitrcade!")
+                quarter_msg = (f"{message.author.name} dropped a quarter in the Pitrcade! ")
+                game_results = Player.objects.get(username=message.author.name).insert_quarter()
+                await message.channel.send(quarter_msg + game_results)
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):

@@ -11,24 +11,34 @@ class Player(models.Model):
         self.num_quarters += 1
         points = self.generate_random_score()
         self.score += points
-        game_results = GameResult.objects.filter(max_score__lte=points)
-        game_results = game_results.order_by('max_score').desc()
+        self.save()
+        game_results = GameResult.objects.filter(min_score__lte=points)
+        game_results = game_results.order_by('-min_score')
         result_message = game_results.values_list('message', flat=True)[0]
-        return result_message
+        return result_message.format(username=self.username, score=points, total_score=self.score)
 
     def generate_random_score(self):
-        return random.randint(0, 1000)
+        try:
+            min_score = int(ConfigurationSetting.objects.get(key='Minimum points per donation').value)
+        except:
+            min_score = 0
+
+        try:
+            max_score = int(ConfigurationSetting.objects.get(key='Maximum points per donation').value)
+        except:
+            max_score = 1000
+        return random.randint(min_score, max_score)
 
     def __str__(self):
         return f'{self.username}'
 
 
 class GameResult(models.Model):
-    max_score = models.IntegerField(default=0, unique=True)
+    min_score = models.IntegerField(default=0, unique=False)
     message = models.TextField(blank=True)
 
     def __str__(self):
-        return f'{self.max_score}'
+        return f'{self.min_score}'
 
 
 class ConfigurationSetting(models.Model):
