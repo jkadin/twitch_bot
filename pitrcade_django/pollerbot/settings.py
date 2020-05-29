@@ -50,6 +50,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 LOGIN_REDIRECT_URL="/admin"
+LOGOUT_REDIRECT_URL="/pitrcade"
+
 
 
 # Application definition

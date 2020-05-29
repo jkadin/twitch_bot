@@ -21,6 +21,7 @@ from django.views.generic import RedirectView
 urlpatterns = [
     path('pitrcade/', include('pitrcade.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/login/', RedirectView.as_view(url='/accounts/twitch/login/')),
     path('accounts/', include('allauth.urls')),
     path('', RedirectView.as_view(pattern_name='pitrcade:scoreboard')),
 ]
