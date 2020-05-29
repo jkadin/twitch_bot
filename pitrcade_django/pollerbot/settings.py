@@ -14,6 +14,8 @@ import os
 
 load_dotenv()
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -31,8 +33,23 @@ DEBUG = True
 ALLOWED_HOSTS = [
     os.getenv('LOCAL_IP'),
     os.getenv('LOCAL_HOSTNAME'),
+    'localhost',
     '127.0.0.1',
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'twitch': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': os.getenv('TWITCH_AUTH_CLIENT_ID'),
+            'secret': os.getenv('TWITCH_AUTH_CLIENT_SECRET'),
+        }
+    }
+}
+
+LOGIN_REDIRECT_URL="/admin"
 
 
 # Application definition
@@ -45,6 +62,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.twitch',
 ]
 
 MIDDLEWARE = [
@@ -106,6 +128,18 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 3
+
+
 
 
 # Internationalization

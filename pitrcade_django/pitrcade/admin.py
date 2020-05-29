@@ -1,10 +1,12 @@
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 
 from .models import Player, GameResult, ConfigurationSetting
 
 
 admin.site.site_header = ConfigurationSetting.objects.get(key='Game Title').value
 admin.site.site_title = ConfigurationSetting.objects.get(key='Game Title').value
+admin.site.login = login_required(admin.site.login)
 
 
 class PlayerAdmin(admin.ModelAdmin):
