@@ -48,7 +48,7 @@ class Bot(commands.Bot):
             if matcher and int(matcher.group("bits")) == 25:
                 obj, created = Player.objects.get_or_create(username=message.author.name)
                 game_results = obj.insert_quarter()
-                await message.channel.send(quarter_msg + game_results)
+                await message.channel.send(game_results)
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
