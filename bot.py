@@ -41,15 +41,15 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         #Ignore messages from the bot
         if not message.author.name == self.nick.lower():
-            # #DISABLING PITRCADE UNDER PITR CAN APPROVE REPONSE MESSAGES
-            # #Check for bits for Pitrcade
-            # message_without_content = message.raw_data.split("PRIVMSG")[0]
-            # matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
-            # if matcher and int(matcher.group("bits")) == 25:
-            #     obj, created = Player.objects.get_or_create(username=message.author.name)
-            #     quarter_msg = (f"{message.author.name} dropped a quarter in the Pitrcade! ")
-            #     game_results = obj.insert_quarter()
-            #     await message.channel.send(quarter_msg + game_results)
+            #DISABLING PITRCADE UNDER PITR CAN APPROVE REPONSE MESSAGES
+            #Check for bits for Pitrcade
+            message_without_content = message.raw_data.split("PRIVMSG")[0]
+            matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
+            if matcher and int(matcher.group("bits")) == 25:
+                obj, created = Player.objects.get_or_create(username=message.author.name)
+                quarter_msg = (f"{message.author.name} dropped a quarter in the Pitrcade! ")
+                game_results = obj.insert_quarter()
+                await message.channel.send(quarter_msg + game_results)
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
