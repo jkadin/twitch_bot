@@ -47,7 +47,6 @@ class Bot(commands.Bot):
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
             if matcher and int(matcher.group("bits")) == 25:
                 obj, created = Player.objects.get_or_create(username=message.author.name)
-                quarter_msg = (f"{message.author.name} dropped a quarter in the Pitrcade! ")
                 game_results = obj.insert_quarter()
                 await message.channel.send(quarter_msg + game_results)
             if self.poll is not None and not message.content.startswith('!'):
