@@ -12,10 +12,11 @@ class Player(models.Model):
         points = self.generate_random_score()
         self.score += points
         self.save()
+        game_title = ConfigurationSetting.objects.get(key='Game Title').value
         game_results = GameResult.objects.filter(min_score__lte=points)
         game_results = game_results.order_by('-min_score')
         result_message = game_results.values_list('message', flat=True)[0]
-        return result_message.format(username=self.username, score=points, total_score=self.score)
+        return result_message.format(username=self.username, score=points, total_score=self.score, game_title=game_title)
 
     def generate_random_score(self):
         try:
