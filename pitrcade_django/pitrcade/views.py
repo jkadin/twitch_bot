@@ -9,25 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Player, ConfigurationSetting
 
-#For debugging
-class ListView(generic.ListView):
-    template_name = 'pitrcade/list_view.html'
-
-    def get_queryset(self):
-        current_app = self.request.resolver_match.namespace
-        model = apps.get_model(current_app, self.kwargs['model'])
-        return model.objects.all()
-
-#For debugging
-class DetailView(generic.DetailView):
-    template_name = 'pitrcade/detail_view.html'
-
-    def get_queryset(self):
-        current_app = self.request.resolver_match.namespace
-        model = apps.get_model(current_app, self.kwargs['model'])
-        return model.objects.all().values()
-
-
 class ScoreboardView(generic.ListView):
     template_name = 'pitrcade/scoreboard.html'
     context_object_name = 'player_list'
