@@ -11,7 +11,7 @@ sys.path.append("pitrcade_django")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pollerbot.settings")
 import django
 django.setup()
-from pitrcade.models import Player
+from pitrcade.models import Player, PollerbotData
 
 POLL_MODS = ['zinge']
 
@@ -19,7 +19,6 @@ POLL_MODS = ['zinge']
 class Bot(commands.Bot):
     def __init__(self):
         self.poll = None
-        self.stats = {}
         super().__init__(irc_token=os.getenv('TMI_TOKEN'),
                         client_id=os.getenv('CLIENT_ID'),
                         nick=os.getenv('BOT_NICK'),
@@ -103,26 +102,38 @@ class Bot(commands.Bot):
         cmd_prefix = os.getenv('BOT_PREFIX')
         await ctx.send(f'"{cmd_prefix} new TITLE | OPTION 1 | OPTION 2" to start a poll  --  "{cmd_prefix}" to check the results on an existing poll  --  "{cmd_prefix} end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
 
+
     @commands.command(name='dsdeaths')
     async def dsdeaths(self, ctx, *, args=""):
-        time_since_death = None
-        if not "dsdeaths" in self.stats:
-            self.stats["dsdeaths"] = [0, datetime.datetime.now()]
+        await ctx.send("This command is now '!ppoll deaths' (instead of dsdeaths). Use '!ppoll deaths help' for commands.")
+
+
+    @commands.command(name='deaths')
+    async def deaths(self, ctx, *, args=""):
+        dc_obj, created = PollerbotData.objects.get_or_create(key='death_counter', defaults={'value': 0})
+        ldt_obj, created = PollerbotData.objects.get_or_create(key='last_death_timestamp', defaults={'value': datetime.datetime.now().isoformat()})
+        death_counter = int(dc_obj.value)
+        last_death_timestamp = datetime.datetime.fromisoformat(ldt_obj.value)
+        now = datetime.datetime.now()
+        time_since_death = now - last_death_timestamp
         if "help" in args:
-            await ctx.send('Temporary Dark Soul Death Commands: !ppoll dsdeaths | !ppoll dsdeaths add/subtract | !ppoll dsdeaths set 10')
+            await ctx.send('Death Counter Commands: !ppoll deaths | !ppoll deaths add/subtract | !ppoll deaths set 10 | (This counter is saved when Pollerbot restarts)')
             return
-        elif "add" in args:
-            self.stats["dsdeaths"][0] += 1
-            time_since_death = datetime.datetime.now() - self.stats["dsdeaths"][1]
-            self.stats["dsdeaths"][1] = datetime.datetime.now()
-        elif "subtract" in args:
-            if self.stats["dsdeaths"][0] > 0:
-                self.stats["dsdeaths"][0] -= 1
-        elif "set" in args:
-            deaths = int(args.split()[-1])
-            if deaths >= 0:
-                self.stats["dsdeaths"][0] = deaths
-        msg = "Pitr has died {} times in Dark Souls.".format(self.stats["dsdeaths"][0])
+        elif "add" in args or "subtract" in args or "set" in args:
+            if "add" in args:
+                death_counter += 1
+                ldt_obj.value = now
+                ldt_obj.save()
+            elif "subtract" in args:
+                if death_counter > 0:
+                    death_counter -= 1
+            elif "set" in args:
+                deaths = int(args.split()[-1])
+                if deaths >= 0:
+                    death_counter = deaths
+            dc_obj.value = death_counter
+            dc_obj.save()
+        msg = "Pitr has died {} times.".format(death_counter)
         if time_since_death:
             msg += " It's been ~{} minutes since his last death.".format(int(time_since_death.total_seconds() / 60))
         await ctx.send(msg)

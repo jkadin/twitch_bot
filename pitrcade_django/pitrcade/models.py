@@ -48,3 +48,11 @@ class ConfigurationSetting(models.Model):
 
     def __str__(self):
         return f'{self.key}: {self.value}'
+
+
+class PollerbotData(models.Model):
+    key = models.CharField(max_length=50)
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.key}: {self.value}'
