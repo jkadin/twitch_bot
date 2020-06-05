@@ -15,6 +15,7 @@ h2 {
   color: blue;
   /* font-size: 1.7vw; */
   font-size: max(1.7vw, 16px);
+  line-height: max(3vw, 32px);
 }
 
 h3 {
