@@ -12,8 +12,9 @@ class Player(models.Model):
         points = self.generate_random_score()
         # self.score += points
         # Changing to non-cumulative score per Pitr's request
-        self.score = points
-        self.save()
+        if points > self.score:
+            self.score = points
+            self.save()
         game_title = ConfigurationSetting.objects.get(key='Game Title').value
         game_results = GameResult.objects.filter(min_score__lte=points)
         game_results = game_results.order_by('-min_score')
