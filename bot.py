@@ -40,7 +40,6 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         #Ignore messages from the bot
         if not message.author.name == self.nick.lower():
-            #DISABLING PITRCADE UNDER PITR CAN APPROVE REPONSE MESSAGES
             #Check for bits for Pitrcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
@@ -122,7 +121,7 @@ class Bot(commands.Bot):
         elif "add" in args or "subtract" in args or "set" in args:
             if "add" in args:
                 death_counter += 1
-                ldt_obj.value = now
+                ldt_obj.value = now.isoformat()
                 ldt_obj.save()
             elif "subtract" in args:
                 if death_counter > 0:

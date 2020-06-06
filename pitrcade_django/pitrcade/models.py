@@ -10,7 +10,9 @@ class Player(models.Model):
     def insert_quarter(self):
         self.num_quarters += 1
         points = self.generate_random_score()
-        self.score += points
+        # self.score += points
+        # Changing to non-cumulative score per Pitr's request
+        self.score = points
         self.save()
         game_title = ConfigurationSetting.objects.get(key='Game Title').value
         game_results = GameResult.objects.filter(min_score__lte=points)
