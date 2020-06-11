@@ -1,15 +1,15 @@
 from django.core.management.base import BaseCommand, CommandError
 from pitrcade.models import Player, ConfigurationSetting
-import datetime
+from preferences import preferences
+from django.utils import timezone
 
 class Command(BaseCommand):
     help = 'Reset the scoreboard for the week'
 
     def handle(self, *args, **options):
-        reset_obj = ConfigurationSetting.objects.get(key='Player Reset Datetime')
-        reset_datetime = datetime.datetime.fromisoformat(reset_obj.value)
-        now = datetime.datetime.now()
+        reset_datetime = preferences.ConfigSetting.scoreboard_next_player_reset
+        now = timezone.now()
         if now >= reset_datetime:
             Player.objects.all().delete()
-            reset_obj.value = (reset_datetime + datetime.timedelta(weeks=1)).isoformat()
-            reset_obj.save()
+            reset_datetime = (reset_datetime + preferences.ConfigSetting.scoreboard_player_reset_interval)
+            preferences.ConfigSetting.save()

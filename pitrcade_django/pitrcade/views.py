@@ -7,7 +7,8 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Player, ConfigurationSetting
+from .models import Player
+from preferences import preferences
 
 class ScoreboardView(generic.ListView):
     template_name = 'pitrcade/scoreboard.html'
@@ -15,14 +16,14 @@ class ScoreboardView(generic.ListView):
 
     def get_queryset(self):
         """Return the top x players by score"""
-        top_scores = int(ConfigurationSetting.objects.get(key='Scoreboard Top Scores').value)
+        top_scores = preferences.ConfigSetting.scoreboard_number_of_top_scores
         return Player.objects.order_by('-score')[:top_scores]
 
     def get_context_data(self, **kwargs):
         context = super(ScoreboardView, self).get_context_data(**kwargs)
         context['json_player_list'] = serializers.serialize('json', context['player_list'], fields=('username', 'score'))
-        context['game_title'] = ConfigurationSetting.objects.get(key='Game Title').value
-        context['scoreboard_refresh'] = ConfigurationSetting.objects.get(key='Scoreboard Refresh').value
+        context['game_title'] = preferences.ConfigSetting.game_title
+        context['scoreboard_refresh'] = preferences.ConfigSetting.scoreboard_refresh_seconds
         return context
 
     def render_to_response(self, context, **response_kwargs):

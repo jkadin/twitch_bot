@@ -1,11 +1,13 @@
 from django.contrib import admin
+from preferences.admin import PreferencesAdmin
 from django.contrib.auth.decorators import login_required
+from preferences import preferences
 
-from .models import Player, GameResult, ConfigurationSetting
+from .models import Player, GameResult, ConfigurationSetting, ConfigSetting
 
 
-admin.site.site_header = ConfigurationSetting.objects.get(key='Game Title').value
-admin.site.site_title = ConfigurationSetting.objects.get(key='Game Title').value
+admin.site.site_header = preferences.ConfigSetting.game_title
+admin.site.site_title = preferences.ConfigSetting.game_title
 admin.site.login = login_required(admin.site.login)
 
 
@@ -33,3 +35,5 @@ class ConfigurationSettingAdmin(admin.ModelAdmin):
     list_display_links = None
 
 admin.site.register(ConfigurationSetting, ConfigurationSettingAdmin)
+
+admin.site.register(ConfigSetting, PreferencesAdmin)

@@ -4,22 +4,19 @@ body {
   color: white;
   text-transform: uppercase;
 }
-
+/* 
 h1 {
   color: red;
-  /* font-size: 2.1vw; */
   font-size: max(2.1vw, 18px);
 }
 
 h2 {
   color: blue;
-  /* font-size: 1.7vw; */
   font-size: max(1.7vw, 16px);
   line-height: max(3vw, 32px);
 }
 
 h3 {
   color: yellow;
-  /* font-size: 1.5vw; */
   font-size: max(1.5vw, 15px);
-}
+} */

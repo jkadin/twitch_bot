@@ -1,10 +1,10 @@
 {% extends 'pitrcade/base.html' %}
 {% load static %}
 
-{% block title %}{{ game_title }}{% endblock %}
+{% block title %}{{ preferences.ConfigSetting.game_title }}{% endblock %}
 
 {% block extra_css %}
-{# Using embedded stylesheet to allow static template tag for url src #}
+{# Using embedded stylesheets to allow django template tags in css #}
 <style>
 @font-face {
   font-family: 'Press Start 2P';
@@ -16,6 +16,21 @@
        url('{% static 'pitrcade/fonts/PressStart2P.woff' %}') format('woff'),
        url('{% static 'pitrcade/fonts/PressStart2P.ttf' %}') format('truetype');
 }
+h1 {
+  color: {{ preferences.ConfigSetting.scoreboard_header_color }};
+  font-size: max(2.1vw, 18px);
+}
+
+h2 {
+  color: {{ preferences.ConfigSetting.scoreboard_player_color }};
+  font-size: max(1.7vw, 16px);
+  line-height: max(3vw, 32px);
+}
+
+h3 {
+  color: {{ preferences.ConfigSetting.scoreboard_title_color }};
+  font-size: max(1.5vw, 15px);
+}
 </style>
 <link rel="stylesheet" type="text/css" href="{% static 'pitrcade/css/scoreboard.css' %}" />
 {% endblock %}
@@ -23,7 +38,7 @@
 {% block content %}
 <div class='text-center'>
 <br>
-<h3>{{ game_title }}</h3>
+<h3>{{ preferences.ConfigSetting.game_title }}</h3>
 <br>
 <br>
 <h1>High Scores</h1>
