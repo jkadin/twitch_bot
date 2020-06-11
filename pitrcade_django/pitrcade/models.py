@@ -1,6 +1,7 @@
 from django.db import models
 import random
 import datetime
+from django.utils import timezone
 from colorfield.fields import ColorField
 from preferences.models import Preferences
 from preferences import preferences
@@ -49,13 +50,6 @@ class GameResult(models.Model):
         return f'{self.min_score}'
 
 
-class ConfigurationSetting(models.Model):
-    key = models.CharField(max_length=50)
-    value = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f'{self.key}: {self.value}'
-
 class ConfigSetting(Preferences):
     game_title = models.CharField(max_length=50)
     min_score = models.IntegerField(default=0)
@@ -66,7 +60,7 @@ class ConfigSetting(Preferences):
     scoreboard_title_color = ColorField(default='#FFFF00') # Default: yellow
     scoreboard_header_color = ColorField(default='#FF0000') # Default: red
     scoreboard_player_color = ColorField(default='#0000FF') # Default: blue
-    scoreboard_next_player_reset = models.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(weeks=1))
+    scoreboard_next_player_reset = models.DateTimeField(default=timezone.now() + datetime.timedelta(weeks=1))
     scoreboard_player_reset_interval = models.DurationField(default=datetime.timedelta(weeks=1))
 
 

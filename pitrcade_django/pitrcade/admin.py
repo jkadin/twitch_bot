@@ -3,7 +3,7 @@ from preferences.admin import PreferencesAdmin
 from django.contrib.auth.decorators import login_required
 from preferences import preferences
 
-from .models import Player, GameResult, ConfigurationSetting, ConfigSetting
+from .models import Player, GameResult, ConfigSetting
 
 
 admin.site.site_header = preferences.ConfigSetting.game_title
@@ -26,15 +26,6 @@ class GameResultAdmin(admin.ModelAdmin):
     ordering = ['min_score']
 
 admin.site.register(GameResult, GameResultAdmin)
-
-
-class ConfigurationSettingAdmin(admin.ModelAdmin):
-    list_display = ['key', 'value']
-    list_editable = ['value']
-    ordering = ['key']
-    list_display_links = None
-
-admin.site.register(ConfigurationSetting, ConfigurationSettingAdmin)
 
 class ModifiedPreferencesAdmin(PreferencesAdmin):
     exclude = ('sites',)
