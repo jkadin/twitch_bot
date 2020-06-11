@@ -36,4 +36,7 @@ class ConfigurationSettingAdmin(admin.ModelAdmin):
 
 admin.site.register(ConfigurationSetting, ConfigurationSettingAdmin)
 
-admin.site.register(ConfigSetting, PreferencesAdmin)
+class ModifiedPreferencesAdmin(PreferencesAdmin):
+    exclude = ('sites',)
+
+admin.site.register(ConfigSetting, ModifiedPreferencesAdmin)
