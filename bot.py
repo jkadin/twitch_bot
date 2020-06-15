@@ -37,6 +37,7 @@ class Bot(commands.Bot):
         await self.join_channels([os.getenv('CHANNEL')])
         print(f"Joined channel {os.getenv('CHANNEL')}")
 
+
     async def event_message(self, message):
         #Ignore messages from the bot
         if not message.author.name == self.nick.lower():
@@ -50,20 +51,29 @@ class Bot(commands.Bot):
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
-                        if not message.author in list(chain.from_iterable(self.poll['options'].values())):
-                            self.poll['options'][option].append(message.author)
-                            await message.channel.send(f"{message.author.name} voted for {option}")
-                        else:
-                            await message.channel.send(f"{message.author.name} already voted in this poll")
+                        if not self.poll['multi']: # Vote for a single choice
+                            if not message.author in list(chain.from_iterable(self.poll['options'].values())):
+                                self.poll['options'][option].append(message.author)
+                                await message.channel.send(f"{message.author.name} voted for {option}")
+                            else:
+                                await message.channel.send(f"{message.author.name} already voted in this poll")
+                        else: # Vote for multiple choices
+                            if not message.author in self.poll['options'][option]:
+                                self.poll['options'][option].append(message.author)
+                                await message.channel.send(f"{message.author.name} voted for {option}")
+                            else:
+                                await message.channel.send(f"{message.author.name} already voted for {option} in this poll")
+
             elif message.content == os.getenv('BOT_PREFIX'):
                 if self.poll is not None:
                     poll_results = self.get_poll_results()
                     await message.channel.send(f"Current results: {self.poll['title']} - {' / '.join(poll_results)}")
                 else:
-                    await message.channel.send('There is no current poll. Use "!poll new TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
+                    await message.channel.send('There is no current poll. Use "!poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
         await self.handle_commands(message)
 
-    @commands.command(name='new')
+
+    @commands.command(name='new', aliases=['newmulti'])
     async def new_poll(self, ctx, *, args):
         if not ctx.author.is_mod and not ctx.author.name in POLL_MODS:
             await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
@@ -72,17 +82,19 @@ class Bot(commands.Bot):
             await ctx.send('There is an existing poll. Use "!poll end" to get results before starting a new one.')
             return
         if not args:
-            await ctx.send('You need to supply a title and options. - !poll new TITLE | OPTION 1 | OPTION 2 | etc')
+            await ctx.send('You need to supply a title and options. - !poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc')
             return
         args = [a.strip() for a in args.split('|') if a.strip()]
         if len(args) < 2:
-            await ctx.send('You need at least a title and 1 poll option - !poll new TITLE | OPTION 1 | OPTION 2 | etc')
+            await ctx.send('You need at least a title and 1 poll option - !poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc')
             return
         self.poll = {'title': args[0],
-                    'options': dict([(o, []) for o in args[1:]])}
+                    'options': dict([(o, []) for o in args[1:]]),
+                    'multi': ctx.content.split()[1] == "newmulti"}
         formatted_options = [f"{i+1}. {o}" for i, o in enumerate(self.poll['options'].keys())]
         msg = f"Poll: {self.poll['title']} - {' / '.join(formatted_options)}"
         await ctx.send(msg)
+
 
     @commands.command(name='end')
     async def end_poll(self, ctx):
@@ -94,12 +106,13 @@ class Bot(commands.Bot):
             await ctx.send(f"Final results: {self.poll['title']} - {' / '.join(poll_results)}")
             self.poll = None
         else:
-            await ctx.send('There is no current poll. Use "!poll new TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
+            await ctx.send('There is no current poll. Use "!poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
+
 
     @commands.command(name='help')
     async def help_poll(self, ctx):
         cmd_prefix = os.getenv('BOT_PREFIX')
-        await ctx.send(f'"{cmd_prefix} new TITLE | OPTION 1 | OPTION 2" to start a poll  --  "{cmd_prefix}" to check the results on an existing poll  --  "{cmd_prefix} end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
+        await ctx.send(f'"{cmd_prefix} new/newmulti TITLE | OPTION 1 | OPTION 2" to start a poll  --  "{cmd_prefix}" to check the results on an existing poll  --  "{cmd_prefix} end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
 
 
     @commands.command(name='dsdeaths')
