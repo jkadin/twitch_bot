@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from pitrcade.models import Player, ConfigurationSetting
+from pitrcade.models import Player, ConfigSetting
 from preferences import preferences
 from django.utils import timezone
 
