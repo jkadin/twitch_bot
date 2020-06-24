@@ -11,5 +11,5 @@ class Command(BaseCommand):
         now = timezone.now()
         if now >= reset_datetime:
             Player.objects.all().delete()
-            reset_datetime = (reset_datetime + preferences.ConfigSetting.scoreboard_player_reset_interval)
+            preferences.ConfigSetting.scoreboard_next_player_reset = (reset_datetime + preferences.ConfigSetting.scoreboard_player_reset_interval)
             preferences.ConfigSetting.save()
