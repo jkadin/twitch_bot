@@ -69,7 +69,7 @@ class Bot(commands.Bot):
                     poll_results = self.get_poll_results()
                     await message.channel.send(f"Current results: {self.poll['title']} - {' / '.join(poll_results)}")
                 else:
-                    await message.channel.send('There is no current poll. Use "!poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
+                    await message.channel.send(f'There is no current poll. Use "!ppoll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
         await self.handle_commands(message)
 
 
@@ -79,14 +79,14 @@ class Bot(commands.Bot):
             await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
             return
         if self.poll is not None:
-            await ctx.send('There is an existing poll. Use "!poll end" to get results before starting a new one.')
+            await ctx.send(f'There is an existing poll. Use "!ppoll end" to get results before starting a new one.')
             return
         if not args:
-            await ctx.send('You need to supply a title and options. - !poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc')
+            await ctx.send(f'You need to supply a title and options. - !ppoll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc')
             return
         args = [a.strip() for a in args.split('|') if a.strip()]
         if len(args) < 2:
-            await ctx.send('You need at least a title and 1 poll option - !poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc')
+            await ctx.send(f'You need at least a title and 1 poll option - !ppoll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc')
             return
         self.poll = {'title': args[0],
                     'options': dict([(o, []) for o in args[1:]]),
@@ -106,18 +106,18 @@ class Bot(commands.Bot):
             await ctx.send(f"Final results: {self.poll['title']} - {' / '.join(poll_results)}")
             self.poll = None
         else:
-            await ctx.send('There is no current poll. Use "!poll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
+            await ctx.send(f'There is no current poll. Use "!ppoll new/newmulti TITLE | OPTION 1 | OPTION 2 | etc" to start one.')
 
 
     @commands.command(name='help')
     async def help_poll(self, ctx):
         cmd_prefix = os.getenv('BOT_PREFIX')
-        await ctx.send(f'"{cmd_prefix} new/newmulti TITLE | OPTION 1 | OPTION 2" to start a poll  --  "{cmd_prefix}" to check the results on an existing poll  --  "{cmd_prefix} end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
+        await ctx.send(f'"!ppoll new/newmulti TITLE | OPTION 1 | OPTION 2" to start a poll  --  "!ppoll" to check the results on an existing poll  --  "!ppoll end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
 
 
     @commands.command(name='dsdeaths')
     async def dsdeaths(self, ctx, *, args=""):
-        await ctx.send("This command is now '!ppoll deaths' (instead of dsdeaths). Use '!ppoll deaths help' for commands.")
+        await ctx.send(f"This command is now '!ppoll deaths' (instead of dsdeaths). Use '!ppoll deaths help' for commands.")
 
 
     @commands.command(name='deaths')
@@ -129,7 +129,7 @@ class Bot(commands.Bot):
         now = datetime.datetime.now()
         time_since_death = now - last_death_timestamp
         if "help" in args:
-            await ctx.send('Death Counter Commands: !ppoll deaths | !ppoll deaths add/subtract | !ppoll deaths set 10 | (This counter is saved when Pollerbot restarts)')
+            await ctx.send(f'Death Counter Commands: !ppoll deaths | !ppoll deaths add/subtract | !ppoll deaths set 10 | (This counter is saved when Pollerbot restarts)')
             return
         elif "add" in args or "subtract" in args or "set" in args:
             if "add" in args:
