@@ -165,7 +165,7 @@ class Bot(commands.Bot):
     @commands.command(name='help')
     async def help_poll(self, ctx):
         cmd_prefix = os.getenv('BOT_PREFIX')
-        await ctx.send(f'"!ppoll new/newmulti TITLE | OPTION 1 | OPTION 2" to start a poll  --  "!ppoll" to check the results on an existing poll  --  "!ppoll end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
+        await ctx.send(f'"!ppoll new/newmulti TITLE | OPTION 1 | OPTION 2" to start a poll  --  "!ppoll" to check the results on an existing poll  --  "!ppoll save" to save the current poll as a premade  --  "!ppoll load TITLE" to load a premade poll  --  "!ppoll end" to finish a poll and close out the results  --  Once a poll is started, chat can vote by typing either the number or the name of what they want to vote for.')
 
 
     @commands.command(name='dsdeaths')
