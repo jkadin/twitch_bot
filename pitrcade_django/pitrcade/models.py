@@ -64,6 +64,12 @@ class ConfigSetting(Preferences):
     scoreboard_player_reset_interval = models.DurationField(default=datetime.timedelta(weeks=1))
 
 
+class PremadePoll(models.Model):
+    title = models.CharField(max_length=100, unique=True)
+    options = models.TextField()
+    multi = models.BooleanField(default=False)
+
+
 class PollerbotData(models.Model):
     key = models.CharField(max_length=50)
     value = models.CharField(max_length=100)

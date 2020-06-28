@@ -3,7 +3,7 @@ from preferences.admin import PreferencesAdmin
 from django.contrib.auth.decorators import login_required
 from preferences import preferences
 
-from .models import Player, GameResult, ConfigSetting
+from .models import Player, GameResult, ConfigSetting, PremadePoll
 
 
 admin.site.site_header = preferences.ConfigSetting.game_title
@@ -31,3 +31,12 @@ class ModifiedPreferencesAdmin(PreferencesAdmin):
     exclude = ('sites',)
 
 admin.site.register(ConfigSetting, ModifiedPreferencesAdmin)
+
+class PremadePollAdmin(admin.ModelAdmin):
+    list_display = ['title', 'multi', 'options']
+    list_editable = ['title', 'multi', 'options']
+    list_display_links = None
+    ordering = ['title']
+    search_fields = ['title']
+
+admin.site.register(PremadePoll, PremadePollAdmin)
