@@ -114,7 +114,7 @@ class Bot(commands.Bot):
         if not args:
             await ctx.send(f'You need to supply a premade poll title to load. Use "!ppoll help" for more info.')
             return
-        args = args.strip().lower()
+        args = args.strip()
         try:
             premade = PremadePoll.objects.get(title=args)
         except PremadePoll.DoesNotExist:
