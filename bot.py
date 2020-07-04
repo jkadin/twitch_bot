@@ -34,7 +34,7 @@ class Bot(commands.Bot):
             poll_results = ["No votes have been cast"]
         else:
             poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)"
-                            for o, users in sorted(self.poll['options'].items(), key=operator.itemgetter(1), reverse=True)]
+                            for o, users in sorted(self.poll['options'].items(), key=lambda x: len(x[1]), reverse=True)]
         return poll_results
 
 
