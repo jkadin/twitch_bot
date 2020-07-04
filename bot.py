@@ -27,14 +27,18 @@ class Bot(commands.Bot):
                         prefix=os.getenv('BOT_PREFIX'),
                         initial_channels=[])
 
-    def get_poll_results(self):
+    def get_poll_results(self, sorted=False):
         total_votes = len(list(chain.from_iterable(self.poll['options'].values())))
         poll_results = []
         if not total_votes:
             poll_results = ["No votes have been cast"]
         else:
-            poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)"
+            if sorted:
+                poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)"
                             for o, users in sorted(self.poll['options'].items(), key=lambda x: len(x[1]), reverse=True)]
+            else:
+                poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)"
+                            for o, users in self.poll['options'].items()]
         return poll_results
 
 
@@ -155,7 +159,7 @@ class Bot(commands.Bot):
             await ctx.send(f"Sorry, {ctx.author.name} isn't allowed to moderate polls.")
             return
         if self.poll is not None:
-            poll_results = self.get_poll_results()
+            poll_results = self.get_poll_results(sorted=True)
             await ctx.send(f"Final results: {self.poll['title']} - {' / '.join(poll_results)}")
             self.poll = None
         else:
