@@ -33,12 +33,10 @@ class Bot(commands.Bot):
         if not total_votes:
             poll_results = ["No votes have been cast"]
         else:
+            poll_results = [(o, len(users)) for o, users in self.poll['options'].items()]
             if sorted:
-                poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)"
-                            for o, users in sorted(self.poll['options'].items(), key=lambda x: len(x[1]), reverse=True)]
-            else:
-                poll_results = [f"{o} ({len(users)} - {len(users)/total_votes*100:.0f}%)"
-                            for o, users in self.poll['options'].items()]
+                poll_results.sort(key=operator.itemgetter(1), reverse=True)
+            poll_results = [f"{o} ({i} - {i/total_votes*100:.0f}%)" for o, i in poll_results]
         return poll_results
 
 
