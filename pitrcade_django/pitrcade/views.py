@@ -58,9 +58,9 @@ class GameResultHistory(SingleTableView):
 
 class StreamlabsAuthView(generic.View):
     def get(self, request, *args, **kwargs):
+        # redirect_uri='http://127.0.0.1:8000/accounts/streamlabs/'
+        redirect_uri='http://pitrcade.justsals.com/accounts/streamlabs/'
         if not 'code' in request.GET:
-            print("doing the auth")
-            redirect_uri='http://127.0.0.1:8000/accounts/streamlabs/'
             response_type='code'
             scope='alerts.create alerts.write donations.read donations.create'
             streamlabs = OAuth2Session(SL_CLIENT_ID, redirect_uri=redirect_uri, scope=scope)
@@ -68,8 +68,7 @@ class StreamlabsAuthView(generic.View):
             request.session['oauth_state'] = state
             return redirect(authorization_url)
         else:
-            print('doing the callback')
-            streamlabs = OAuth2Session(SL_CLIENT_ID, redirect_uri='http://127.0.0.1:8000/accounts/streamlabs/', state=request.session['oauth_state'])
+            streamlabs = OAuth2Session(SL_CLIENT_ID, redirect_uri=redirect_uri, state=request.session['oauth_state'])
             token = streamlabs.fetch_token(SL_API_URL + '/token',
                                             include_client_id=True,
                                             client_secret=SL_CLIENT_SECRET,
