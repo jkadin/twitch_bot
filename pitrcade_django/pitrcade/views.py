@@ -78,4 +78,5 @@ class StreamlabsAuthView(generic.View):
             cs = ConfigSetting.objects.get(pk=preferences.ConfigSetting.pk)
             cs.streamlabs_access_token = json.dumps(token)
             cs.save()
+            del request.session['oauth_state']
             return redirect('pitrcade:scoreboard')
