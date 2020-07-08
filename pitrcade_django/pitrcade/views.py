@@ -22,8 +22,7 @@ SL_API_URL = 'https://www.streamlabs.com/api/v1.0'
 SL_CLIENT_ID = os.getenv('STREAMLABS_CLIENT_ID')
 SL_CLIENT_SECRET = os.getenv('STREAMLABS_CLIENT_SECRET')
 
-if os.getenv('DEBUG'):
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 class ScoreboardView(generic.ListView):
     template_name = 'pitrcade/scoreboard.html'
@@ -58,8 +57,8 @@ class GameResultHistory(SingleTableView):
 
 class StreamlabsAuthView(generic.View):
     def get(self, request, *args, **kwargs):
-        # redirect_uri='http://127.0.0.1:8000/accounts/streamlabs/'
-        redirect_uri='http://pitrcade.justsals.com/accounts/streamlabs/'
+        #redirect_uri='http://127.0.0.1:8000/accounts/streamlabs/'
+        redirect_uri='https://pitrcade.justsals.com/accounts/streamlabs/'
         if not 'code' in request.GET:
             response_type='code'
             scope='alerts.create alerts.write donations.read donations.create'
