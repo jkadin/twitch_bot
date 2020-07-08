@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.twitch',
+    'django_tables2',
 ]
 
 MIDDLEWARE = [

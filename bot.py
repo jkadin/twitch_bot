@@ -5,6 +5,8 @@ import re
 from itertools import chain
 from twitchio.ext import commands
 import operator
+import json
+from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -12,11 +14,15 @@ sys.path.append("pitrcade_django")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pollerbot.settings")
 import django
 django.setup()
-from pitrcade.models import Player, PollerbotData, PremadePoll
+from pitrcade.models import Player, PollerbotData, PremadePoll, ConfigSetting
 from django.db.utils import IntegrityError
 
 POLL_MODS = ['zinge']
 
+from preferences import preferences
+SL_API_URL = 'https://www.streamlabs.com/api/v1.0'
+SL_CLIENT_ID = os.getenv('STREAMLABS_CLIENT_ID')
+SL_CLIENT_SECRET = os.getenv('STREAMLABS_CLIENT_SECRET')
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -47,16 +53,37 @@ class Bot(commands.Bot):
         print(f"Joined channel {os.getenv('CHANNEL')}")
 
 
+    def token_saver(self, token):
+        cs = ConfigSetting.objects.get(pk=preferences.ConfigSetting.pk)
+        cs.streamlabs_access_token = json.dumps(token)
+        cs.save()
+
+
     async def event_message(self, message):
         #Ignore messages from the bot
         if not message.author.name == self.nick.lower():
             #Check for bits for Pitrcade
-            message_without_content = message.raw_data.split("PRIVMSG")[0]
+            message_without_content = message.raw_data#.split("PRIVMSG")[0]
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
             if matcher and int(matcher.group("bits")) == 25:
                 obj, created = Player.objects.get_or_create(username=message.author.name)
                 game_results = obj.insert_quarter()
-                await message.channel.send(game_results)
+                await message.channel.send(game_results['message'])
+                extra = {
+                    'client_id': SL_CLIENT_ID,
+                    'client_secret': SL_CLIENT_SECRET,
+                }
+                streamlabs = OAuth2Session(SL_CLIENT_ID, token=json.loads(preferences.ConfigSetting.streamlabs_access_token),
+                                            auto_refresh_kwargs=extra, auto_refresh_url=SL_API_URL + '/token', token_updater=self.token_saver)
+                params = {
+                          "type":"donation",
+                          "image_href": game_results['image_or_video_alert_url'],
+                          "sound_href": game_results['sound_alert_url'],
+                          "message": game_results['message'],
+                          "duration": preferences.ConfigSetting.alert_duration*1000,
+                          "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
+                          }
+                response = streamlabs.post(SL_API_URL + '/alerts', data=params)
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):

@@ -3,7 +3,7 @@ from preferences.admin import PreferencesAdmin
 from django.contrib.auth.decorators import login_required
 from preferences import preferences
 
-from .models import Player, GameResult, ConfigSetting, PremadePoll
+from .models import Player, GameResultMessage, GameResultHistory, ConfigSetting, PremadePoll
 
 
 admin.site.site_header = preferences.ConfigSetting.game_title
@@ -21,14 +21,20 @@ class PlayerAdmin(admin.ModelAdmin):
 admin.site.register(Player, PlayerAdmin)
 
 
-class GameResultAdmin(admin.ModelAdmin):
-    list_display = ['min_score', 'message']
-    ordering = ['min_score']
+class GameResultMessageAdmin(admin.ModelAdmin):
+    list_display = ['score', 'message']
+    ordering = ['score']
 
-admin.site.register(GameResult, GameResultAdmin)
+admin.site.register(GameResultMessage, GameResultMessageAdmin)
+
+class GameResultHistoryAdmin(admin.ModelAdmin):
+    list_display = ['player', 'score', 'datetime']
+    ordering = ['datetime']
+
+admin.site.register(GameResultHistory, GameResultHistoryAdmin)
 
 class ModifiedPreferencesAdmin(PreferencesAdmin):
-    exclude = ('sites',)
+    exclude = ('sites', 'streamlabs_access_token')
 
 admin.site.register(ConfigSetting, ModifiedPreferencesAdmin)
 

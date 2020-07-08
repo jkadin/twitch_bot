@@ -1,0 +1,49 @@
+{% extends 'pitrcade/base.html' %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block title %}{{ preferences.ConfigSetting.game_title }} Game History{% endblock %}
+
+{% block extra_css %}
+{# Using embedded stylesheets to allow django template tags in css #}
+<style>
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Press Start 2P Regular'),
+       local('PressStart2P-Regular'),
+       url('{% static 'pitrcade/fonts/PressStart2P.woff2' %}') format('woff2'),
+       url('{% static 'pitrcade/fonts/PressStart2P.woff' %}') format('woff'),
+       url('{% static 'pitrcade/fonts/PressStart2P.ttf' %}') format('truetype');
+}
+h1 {
+  color: {{ preferences.ConfigSetting.scoreboard_header_color }};
+  font-size: max(2.1vw, 18px);
+}
+
+h2 {
+  color: {{ preferences.ConfigSetting.scoreboard_player_color }};
+  font-size: max(1.7vw, 16px);
+  line-height: max(3vw, 32px);
+}
+
+h3 {
+  color: {{ preferences.ConfigSetting.scoreboard_title_color }};
+  font-size: max(1.5vw, 15px);
+}
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'pitrcade/css/scoreboard.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class='text-center'>
+<br>
+<h3>{{ preferences.ConfigSetting.game_title }}</h3>
+<br>
+<br>
+<h1>Game History</h1>
+<br>
+{% render_table table %}
+</div>
+{% endblock %}
