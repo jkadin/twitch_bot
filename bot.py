@@ -80,6 +80,7 @@ class Bot(commands.Bot):
                               "image_href": game_results['image_or_video_alert_url'],
                               "sound_href": game_results['sound_alert_url'],
                               "message": game_results['message'],
+                              "user_message": "",
                               "duration": preferences.ConfigSetting.alert_duration*1000,
                               "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
                               }
