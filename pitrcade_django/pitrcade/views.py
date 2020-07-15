@@ -47,6 +47,9 @@ class ScoreboardView(generic.ListView):
         else:
             return super(ScoreboardView, self).render_to_response(context, **response_kwargs)
 
+class ScoreboardViewForOverlay(ScoreboardView):
+    template_name = 'pitrcade/scoreboard_overlay.html'
+
 
 class GameResultHistory(SingleTableView):
     model = GameResultHistory
