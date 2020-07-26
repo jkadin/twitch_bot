@@ -33,6 +33,7 @@ class Bot(commands.Bot):
                         prefix=os.getenv('BOT_PREFIX'),
                         initial_channels=[])
 
+
     def get_poll_results(self, sorted=False):
         total_votes = len(list(chain.from_iterable(self.poll['options'].values())))
         poll_results = []
@@ -42,7 +43,9 @@ class Bot(commands.Bot):
             poll_results = [(o, len(users)) for o, users in self.poll['options'].items()]
             if sorted:
                 poll_results.sort(key=operator.itemgetter(1), reverse=True)
-            poll_results = [f"{o} ({i} - {i/total_votes*100:.0f}%)" for o, i in poll_results]
+                poll_results = [f"{o} ({i} - {i/total_votes*100:.0f}%)" for o, i in poll_results]
+            else:
+                poll_results = [f"{index+1}. {result[0]} ({result[1]} - {result[1]/total_votes*100:.0f}%)" for index, result in enumerate(poll_results)]
         return poll_results
 
 
