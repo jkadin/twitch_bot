@@ -134,13 +134,14 @@ class Bot(commands.Bot):
         if not args:
             await self.send(ctx, f'You need to supply a title and options. Use "!ppoll help" for more info.')
             return
-        args = [a.strip() for a in args.split('|') if a.strip()]
+        multi = ctx.content.split()[1] == "newmulti"
+        args = [a.strip() for a in ctx.content.split('newmulti' if multi else 'new')[1].split('|') if a.strip()]
         if len(args) < 2:
             await self.send(ctx, f'You need at least a title and 1 poll option. Use "!ppoll help" for more info.')
             return
         self.poll = {'title': args[0],
                     'options': dict([(o, []) for o in args[1:]]),
-                    'multi': ctx.content.split()[1] == "newmulti"}
+                    'multi': multi}
         formatted_options = [f"{i+1}. {o}" for i, o in enumerate(self.poll['options'].keys())]
         msg = f"Poll: {self.poll['title']} - {' / '.join(formatted_options)}"
         await self.send(ctx, msg)
