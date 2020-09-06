@@ -44,7 +44,7 @@ class Player(models.Model):
                             'sound_alert_url': alert_audio,
                             'alert_duration': alert_duration,
                             'echo_in_chat': echo_in_chat,
-                            'score': point,
+                            'score': points,
                             })
             if points > best_points:
                 best_points = points

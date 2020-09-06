@@ -28,7 +28,7 @@ SL_CLIENT_SECRET = os.getenv('STREAMLABS_CLIENT_SECRET')
 class Bot(commands.Bot):
     def __init__(self):
         self.poll = None
-        self.top_score = Player.objects.order_by('-score')[0]['score']
+        self.top_score = Player.objects.order_by('-score').first().score
         super().__init__(irc_token=os.getenv('TMI_TOKEN'),
                         client_id=os.getenv('CLIENT_ID'),
                         nick=os.getenv('BOT_NICK'),
@@ -78,37 +78,38 @@ class Bot(commands.Bot):
             #Check for bits for Pitrcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
-            bits = int(matcher.group("bits"))
-            if matcher and (bits % 25 == 0):
-                num_plays = int(bits / 25)
-                obj, created = Player.objects.get_or_create(username=message.author.name)
-                game_results = obj.insert_quarter(num_plays)
-                for result in game_results:
-                    try:
-                        extra = {
-                            'client_id': SL_CLIENT_ID,
-                            'client_secret': SL_CLIENT_SECRET,
-                        }
-                        streamlabs = OAuth2Session(SL_CLIENT_ID, token=json.loads(preferences.ConfigSetting.streamlabs_access_token),
-                                                    auto_refresh_kwargs=extra, auto_refresh_url=SL_API_URL + '/token', token_updater=self.token_saver)
-                        params = {
-                                  "type":"donation",
-                                  "image_href": result['image_or_video_alert_url'],
-                                  "sound_href": result['sound_alert_url'],
-                                  "message": result['message'],
-                                  "user_message": " ",
-                                  "duration": result['alert_duration'],
-                                  "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
-                                  }
-                        response = streamlabs.post(SL_API_URL + '/alerts', data=params)
-                        if result['echo_in_chat']:
+            if matcher:
+                bits = int(matcher.group("bits"))
+                if bits % 25 == 0:
+                    num_plays = int(bits / 25)
+                    obj, created = Player.objects.get_or_create(username=message.author.name)
+                    game_results = obj.insert_quarter(num_plays)
+                    for result in game_results:
+                        try:
+                            extra = {
+                                'client_id': SL_CLIENT_ID,
+                                'client_secret': SL_CLIENT_SECRET,
+                            }
+                            streamlabs = OAuth2Session(SL_CLIENT_ID, token=json.loads(preferences.ConfigSetting.streamlabs_access_token),
+                                                        auto_refresh_kwargs=extra, auto_refresh_url=SL_API_URL + '/token', token_updater=self.token_saver)
+                            params = {
+                                      "type":"donation",
+                                      "image_href": result['image_or_video_alert_url'],
+                                      "sound_href": result['sound_alert_url'],
+                                      "message": result['message'],
+                                      "user_message": " ",
+                                      "duration": result['alert_duration'],
+                                      "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
+                                      }
+                            response = streamlabs.post(SL_API_URL + '/alerts', data=params)
+                            if result['echo_in_chat']:
+                                await self.send(message.channel, result['message'].replace('*', ''))
+                            await asyncio.sleep(0)
+                        except:
                             await self.send(message.channel, result['message'].replace('*', ''))
-                        await asyncio.sleep(0)
-                    except:
-                        await self.send(message.channel, result['message'].replace('*', ''))
-                    if result['score'] > self.top_score:
-                        self.top_score = result['score']
-                        await self.send(message.channel, f'{message.author_name} got the new high score of {self.top_score}!')
+                        if result['score'] > self.top_score:
+                            self.top_score = result['score']
+                            await self.send(message.channel, f'{message.author_name} got the new high score of {self.top_score}!')
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
