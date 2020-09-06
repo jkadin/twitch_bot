@@ -77,10 +77,12 @@ class Bot(commands.Bot):
         if not message.author.name == self.nick.lower():
             #Check for bits for Pitrcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
+            message_content = message.raw_data.split("PRIVMSG")[1]
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
             if matcher:
                 bits = int(matcher.group("bits"))
-                if bits % 25 == 0:
+                bit_tokens = ['quarter', 'arcade', 'multiball']
+                if bit == 25 or (bits % 25 == 0 and any(x in message_content for x in bit_tokens)):
                     num_plays = int(bits / 25)
                     obj, created = Player.objects.get_or_create(username=message.author.name)
                     game_results = obj.insert_quarter(num_plays)
