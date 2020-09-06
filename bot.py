@@ -28,6 +28,7 @@ SL_CLIENT_SECRET = os.getenv('STREAMLABS_CLIENT_SECRET')
 class Bot(commands.Bot):
     def __init__(self):
         self.poll = None
+        self.top_score = Player.objects.order_by('-score')[0]['score']
         super().__init__(irc_token=os.getenv('TMI_TOKEN'),
                         client_id=os.getenv('CLIENT_ID'),
                         nick=os.getenv('BOT_NICK'),
@@ -100,9 +101,14 @@ class Bot(commands.Bot):
                                   "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
                                   }
                         response = streamlabs.post(SL_API_URL + '/alerts', data=params)
+                        if result['echo_in_chat']:
+                            await self.send(message.channel, result['message'].replace('*', ''))
                         await asyncio.sleep(0)
                     except:
                         await self.send(message.channel, result['message'].replace('*', ''))
+                    if result['score'] > self.top_score:
+                        self.top_score = result['score']
+                        await self.send(message.channel, f'{message.author_name} got the new high score of {self.top_score}!')
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
