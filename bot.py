@@ -18,7 +18,7 @@ django.setup()
 from pitrcade.models import Player, PollerbotData, PremadePoll, ConfigSetting
 from django.db.utils import IntegrityError
 
-POLL_MODS = ['zinge', 'maxrimus']
+POLL_MODS = ['zinge']
 
 from preferences import preferences
 SL_API_URL = 'https://www.streamlabs.com/api/v1.0'
@@ -102,7 +102,7 @@ class Bot(commands.Bot):
                         response = streamlabs.post(SL_API_URL + '/alerts', data=params)
                         await asyncio.sleep(0)
                     except:
-                        await self.send(message.channel, game_results['message'].replace('*', ''))
+                        await self.send(message.channel, result['message'].replace('*', ''))
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):

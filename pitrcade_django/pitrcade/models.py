@@ -14,9 +14,9 @@ class Player(models.Model):
 
     def insert_quarter(self, num_plays):
         best_points = 0
-        game_reults = []
+        results = []
         game_title = preferences.ConfigSetting.game_title
-        for i in num_plays:
+        for i in range(1, num_plays + 1):
             self.num_quarters += 1
             points = self.generate_random_score()
             history = GameResultHistory(player=self, score=points)
@@ -30,13 +30,13 @@ class Player(models.Model):
                 alert_duration = preferences.ConfigSetting.alert_duration*1000
             else:
                 alert_video = game_results.values_list('image_or_video_alert_multiball_url', flat=True)[0] or 'http://'
-                multiball_alert_duration = preferences.ConfigSetting.alert_duration*1000
+                alert_duration = preferences.ConfigSetting.multiball_alert_duration*1000
             if i > 1:
                 alert_audio = game_results.values_list('sound_alert_multiball_url', flat=True)[0] or 'http://'
             else:
                 alert_audio = game_results.values_list('sound_alert_url', flat=True)[0] or 'http://'
 
-            game_results.append({'message': result_message.format(username=self.username, score=points, total_score=self.score, game_title=game_title),
+            results.append({'message': result_message.format(username=self.username, score=points, total_score=self.score, game_title=game_title),
                             'image_or_video_alert_url': alert_video,
                             'sound_alert_url': alert_audio,
                             'alert_duration': alert_duration,
@@ -48,7 +48,7 @@ class Player(models.Model):
         if best_points > self.score:
             self.score = best_points
             self.save()
-        return game_results
+        return results
 
     def generate_random_score(self):
         min_score = preferences.ConfigSetting.min_score
