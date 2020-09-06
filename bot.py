@@ -109,7 +109,7 @@ class Bot(commands.Bot):
                             await self.send(message.channel, result['message'].replace('*', ''))
                         if result['score'] > self.top_score:
                             self.top_score = result['score']
-                            await self.send(message.channel, f'{message.author_name} got the new high score of {self.top_score}!')
+                            await self.send(message.channel, f'{message.author.name} got the new high score of {self.top_score}!')
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
