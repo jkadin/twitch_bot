@@ -8,6 +8,7 @@ import operator
 import json
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
+import asyncio
 load_dotenv()
 
 sys.path.append("pitrcade_django")
@@ -76,28 +77,32 @@ class Bot(commands.Bot):
             #Check for bits for Pitrcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
-            if matcher and int(matcher.group("bits")) == 25:
+            bits = int(matcher.group("bits"))
+            if matcher and (bits % 25 == 0):
+                num_plays = int(bits / 25)
                 obj, created = Player.objects.get_or_create(username=message.author.name)
-                game_results = obj.insert_quarter()
-                try:
-                    extra = {
-                        'client_id': SL_CLIENT_ID,
-                        'client_secret': SL_CLIENT_SECRET,
-                    }
-                    streamlabs = OAuth2Session(SL_CLIENT_ID, token=json.loads(preferences.ConfigSetting.streamlabs_access_token),
-                                                auto_refresh_kwargs=extra, auto_refresh_url=SL_API_URL + '/token', token_updater=self.token_saver)
-                    params = {
-                              "type":"donation",
-                              "image_href": game_results['image_or_video_alert_url'],
-                              "sound_href": game_results['sound_alert_url'],
-                              "message": game_results['message'],
-                              "user_message": " ",
-                              "duration": preferences.ConfigSetting.alert_duration*1000,
-                              "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
-                              }
-                    response = streamlabs.post(SL_API_URL + '/alerts', data=params)
-                except:
-                    await self.send(message.channel, game_results['message'].replace('*', ''))
+                game_results = obj.insert_quarter(num_plays)
+                for result in game_results:
+                    try:
+                        extra = {
+                            'client_id': SL_CLIENT_ID,
+                            'client_secret': SL_CLIENT_SECRET,
+                        }
+                        streamlabs = OAuth2Session(SL_CLIENT_ID, token=json.loads(preferences.ConfigSetting.streamlabs_access_token),
+                                                    auto_refresh_kwargs=extra, auto_refresh_url=SL_API_URL + '/token', token_updater=self.token_saver)
+                        params = {
+                                  "type":"donation",
+                                  "image_href": result['image_or_video_alert_url'],
+                                  "sound_href": result['sound_alert_url'],
+                                  "message": result['message'],
+                                  "user_message": " ",
+                                  "duration": result['alert_duration'],
+                                  "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
+                                  }
+                        response = streamlabs.post(SL_API_URL + '/alerts', data=params)
+                        await asyncio.sleep(0)
+                    except:
+                        await self.send(message.channel, game_results['message'].replace('*', ''))
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):

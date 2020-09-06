@@ -12,24 +12,42 @@ class Player(models.Model):
     num_quarters = models.IntegerField(default=0)
     score = models.IntegerField(default=0)
 
-    def insert_quarter(self):
-        self.num_quarters += 1
-        points = self.generate_random_score()
+    def insert_quarter(self, num_plays):
+        best_points = 0
+        game_reults = []
+        game_title = preferences.ConfigSetting.game_title
+        for i in num_plays:
+            self.num_quarters += 1
+            points = self.generate_random_score()
+            history = GameResultHistory(player=self, score=points)
+            history.save()
+            game_results = GameResultMessage.objects.filter(score__in=[-1, points])
+            game_results = game_results.order_by('-score')
+            result_message = game_results.values_list('message', flat=True)[0]
+
+            if num_plays > 1:
+                alert_video = game_results.values_list('image_or_video_alert_url', flat=True)[0] or 'http://'
+                alert_duration = preferences.ConfigSetting.alert_duration*1000
+            else:
+                alert_video = game_results.values_list('image_or_video_alert_multiball_url', flat=True)[0] or 'http://'
+                multiball_alert_duration = preferences.ConfigSetting.alert_duration*1000
+            if i > 1:
+                alert_audio = game_results.values_list('sound_alert_multiball_url', flat=True)[0] or 'http://'
+            else:
+                alert_audio = game_results.values_list('sound_alert_url', flat=True)[0] or 'http://'
+
+            game_results.append({'message': result_message.format(username=self.username, score=points, total_score=self.score, game_title=game_title),
+                            'image_or_video_alert_url': alert_video,
+                            'sound_alert_url': alert_audio,
+                            'alert_duration': alert_duration,
+                            })
+            if points > best_points:
+                best_points = points
         # self.score += points
         # Changing to non-cumulative score per Pitr's request
-        if points > self.score:
-            self.score = points
+        if best_points > self.score:
+            self.score = best_points
             self.save()
-        game_title = preferences.ConfigSetting.game_title
-        game_results = GameResultMessage.objects.filter(score__in=[-1, points])
-        game_results = game_results.order_by('-score')
-        history = GameResultHistory(player=self, score=points)
-        history.save()
-        result_message = game_results.values_list('message', flat=True)[0]
-        game_results = {'message': result_message.format(username=self.username, score=points, total_score=self.score, game_title=game_title),
-                        'image_or_video_alert_url': game_results.values_list('image_or_video_alert_url', flat=True)[0] or 'http://',
-                        'sound_alert_url': game_results.values_list('sound_alert_url', flat=True)[0] or 'http://',
-                        }
         return game_results
 
     def generate_random_score(self):
@@ -59,6 +77,8 @@ class GameResultMessage(models.Model):
     message = models.TextField(blank=True)
     image_or_video_alert_url = models.TextField(blank=True)
     sound_alert_url = models.TextField(blank=True)
+    image_or_video_alert_multiball_url = models.TextField(blank=True)
+    sound_alert_multiball_url = models.TextField(blank=True)
 
     def __str__(self):
         return f'{self.score}'
@@ -67,6 +87,7 @@ class GameResultMessage(models.Model):
 class ConfigSetting(Preferences):
     game_title = models.CharField(max_length=50)
     alert_duration = models.IntegerField(default=3)
+    multiball_alert_duration = models.IntegerField(default=1)
     min_score = models.IntegerField(default=0)
     max_score = models.IntegerField(default=1000)
     normal_score_distribution = models.BooleanField(default=True)
