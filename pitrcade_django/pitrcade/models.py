@@ -29,11 +29,11 @@ class Player(models.Model):
             result_message = game_results.values_list('message', flat=True)[0]
 
             if num_plays > 1:
-                alert_video = game_results.values_list('image_or_video_alert_url', flat=True)[0] or 'http://'
-                alert_duration = preferences.ConfigSetting.alert_duration*1000
-            else:
                 alert_video = game_results.values_list('image_or_video_alert_multiball_url', flat=True)[0] or 'http://'
                 alert_duration = preferences.ConfigSetting.multiball_alert_duration*1000
+            else:
+                alert_video = game_results.values_list('image_or_video_alert_url', flat=True)[0] or 'http://'
+                alert_duration = preferences.ConfigSetting.alert_duration*1000
             if i > 1:
                 alert_audio = game_results.values_list('sound_alert_multiball_url', flat=True)[0] or 'http://'
             else:
