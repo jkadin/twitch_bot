@@ -80,7 +80,7 @@ class Bot(commands.Bot):
         if not message.author.name == self.nick.lower():
             #Check for bits for Pitrcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
-            message_content = message.raw_data.split("PRIVMSG")[1]
+            message_content = message.raw_data.split("PRIVMSG")[1].lower()
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
             if matcher:
                 bits = int(matcher.group("bits"))
