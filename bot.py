@@ -28,7 +28,10 @@ SL_CLIENT_SECRET = os.getenv('STREAMLABS_CLIENT_SECRET')
 class Bot(commands.Bot):
     def __init__(self):
         self.poll = None
-        self.top_score = Player.objects.order_by('-score').first().score
+        self.top_score = 0
+        top_score = Player.objects.order_by('-score').first()
+        if top_score:
+            self.top_score = top_score.score
         super().__init__(irc_token=os.getenv('TMI_TOKEN'),
                         client_id=os.getenv('CLIENT_ID'),
                         nick=os.getenv('BOT_NICK'),
