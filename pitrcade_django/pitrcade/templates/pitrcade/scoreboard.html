@@ -65,15 +65,18 @@ function update_scoreboard(player_list, refresh_ms) {
           showCursor: false,
           onComplete: function(){
               $('#player_list_container').html('');
-              get_scores();
+              get_scores(refresh_ms);
           },
     });
 };
 
-function get_scores() {
+function get_scores(refresh_ms) {
     $.ajax({
       url: 'scoreboard',
       cache: false,
+      error: function(){
+        update_scoreboard([], refresh_ms);
+      },
       success: function(player_list){
         update_scoreboard(player_list, refresh_ms);
       },
