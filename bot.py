@@ -262,7 +262,7 @@ class Bot(commands.Bot):
             dc_obj.save()
         msg = "Pitr has died {} times.".format(death_counter)
         if time_since_death:
-            msg += " It's been ~{} minutes since his last death.".format(int(time_since_death.total_seconds() / 60))
+            msg += " It's been ~{} minutes since the last death.".format(int(time_since_death.total_seconds() / 60))
         await self.send(ctx, msg)
 
 
