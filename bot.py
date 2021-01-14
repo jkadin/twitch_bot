@@ -85,7 +85,8 @@ class Bot(commands.Bot):
             if matcher:
                 bits = int(matcher.group("bits"))
                 bit_tokens = ['quarter', 'arcade', 'multiball']
-                if bits == 25 or (bits % 25 == 0 and any(x in message_content for x in bit_tokens)):
+                # if bits == 25 or (bits % 25 == 0 and any(x in message_content for x in bit_tokens)):
+                if bits % 25 == 0:
                     num_plays = int(bits / 25)
                     obj, created = Player.objects.get_or_create(username=message.author.name)
                     game_results = obj.insert_quarter(num_plays)
