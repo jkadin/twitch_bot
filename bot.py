@@ -91,6 +91,7 @@ class Bot(commands.Bot):
                     obj, created = Player.objects.get_or_create(username=message.author.name)
                     game_results = obj.insert_quarter(num_plays)
                     for result in game_results:
+                        streamlabs_failure = False
                         try:
                             extra = {
                                 'client_id': SL_CLIENT_ID,
@@ -112,10 +113,13 @@ class Bot(commands.Bot):
                                 await self.send(message.channel, result['message'].replace('*', ''))
                             await asyncio.sleep(0)
                         except:
-                            await self.send(message.channel, result['message'].replace('*', ''))
+                            # await self.send(message.channel, result['message'].replace('*', ''))
+                            streamlabs_failure = True
                         if result['score'] > self.top_score:
                             self.top_score = result['score']
                             await self.send(message.channel, f'{message.author.name} got the new high score of {self.top_score}!')
+                    if streamlabs_failure:
+                        await self.send(message.channel, f'RIP Streamlabs: Some of {message.author.name}\'s arcade scores weren\'t displayed, but you can always check the arcade history to see how you did!')
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):
