@@ -16,7 +16,6 @@ class Player(models.Model):
         best_points = 0
         results = []
         game_title = preferences.ConfigSetting.game_title
-        echo_in_chat = False
         for i in range(1, num_plays + 1):
             self.num_quarters += 1
             points = self.generate_random_score()
@@ -24,8 +23,6 @@ class Player(models.Model):
             history.save()
             game_results = GameResultMessage.objects.filter(score__in=[-1, points])
             game_results = game_results.order_by('-score')
-            if game_results[0].score != -1:
-                echo_in_chat = True
             result_message = game_results.values_list('message', flat=True)[0]
 
             if num_plays > 1:
@@ -43,7 +40,7 @@ class Player(models.Model):
                             'image_or_video_alert_url': alert_video,
                             'sound_alert_url': alert_audio,
                             'alert_duration': alert_duration,
-                            'echo_in_chat': echo_in_chat,
+                            'echo_in_chat': bool(game_results[0].score != -1),
                             'score': points,
                             })
             if points > best_points:
