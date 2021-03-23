@@ -111,7 +111,8 @@ class Bot(commands.Bot):
                                 await self.send(message.channel, result['message'].replace('*', ''))
                             await asyncio.sleep(0)
                         except:
-                            await self.send(message.channel, result['message'].replace('*', ''))
+                            pass
+                            # await self.send(message.channel, result['message'].replace('*', ''))
                         if result['score'] > self.top_score:
                             self.top_score = result['score']
                             await self.send(message.channel, f'{message.author.name} got the new high score of {self.top_score}!')
