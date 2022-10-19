@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 import re
+import subprocess
 from itertools import chain
 from twitchio.ext import commands
 import operator
@@ -9,7 +10,7 @@ import json
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
 import asyncio
-load_dotenv()
+load_dotenv(override=True)
 
 sys.path.append("pitrcade_django")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pollerbot.settings")
@@ -104,7 +105,7 @@ class Bot(commands.Bot):
                                       "image_href": result['image_or_video_alert_url'],
                                       "sound_href": result['sound_alert_url'],
                                       "message": result['message'],
-                                      "user_message": " ",
+                                      #"user_message": " ",
                                       "duration": result['alert_duration'],
                                       "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
                                       }
@@ -264,10 +265,22 @@ class Bot(commands.Bot):
                     death_counter = deaths
             dc_obj.value = death_counter
             dc_obj.save()
-        msg = "Pitr has died {} times.".format(death_counter)
+        msg = "Kara has died {} times.".format(death_counter)
         if time_since_death:
             msg += " It's been ~{} minutes since the last death.".format(int(time_since_death.total_seconds() / 60))
         await self.send(ctx, msg)
+
+
+    @commands.command(name='deathsbot')
+    async def deathsbot(self, ctx, *, args=""):
+        if not ctx.author.is_mod and not ctx.author.name in POLL_MODS:
+            await self.send(ctx, f"Sorry, {ctx.author.name} isn't allowed to moderate deathsbot.")
+            return
+        if "start" in args:
+            subprocess.call("/usr/bin/screen -dr deathsbot -X quit".split())
+            subprocess.call("/usr/bin/screen -dmS deathsbot /usr/bin/python3 bot.py", cwd="/home/pi/workspace/opencv_deathtracker", shell=True)
+        elif "stop" in args:
+            subprocess.call("/usr/bin/screen -dr deathsbot -X quit".split())
 
 
 if __name__ == "__main__":
