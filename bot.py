@@ -105,7 +105,7 @@ class Bot(commands.Bot):
                                       "image_href": result['image_or_video_alert_url'],
                                       "sound_href": result['sound_alert_url'],
                                       "message": result['message'],
-                                      #"user_message": " ",
+                                      "user_message": "&nbsp;",
                                       "duration": result['alert_duration'],
                                       "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
                                       }
@@ -196,6 +196,28 @@ class Bot(commands.Bot):
         formatted_options = [f"{i+1}. {o}" for i, o in enumerate(self.poll['options'].keys())]
         msg = f"Poll: {self.poll['title']} - {' / '.join(formatted_options)}"
         await self.send(ctx, msg)
+
+
+    @commands.command(name='alert_test')
+    async def alert_test(self, ctx):
+        if not ctx.author.name in POLL_MODS:
+            await self.send(ctx, f"Sorry, {ctx.author.name} isn't allowed to test alerts.")
+            return
+        extra = {
+                                'client_id': SL_CLIENT_ID,
+                                'client_secret': SL_CLIENT_SECRET,
+                }
+        streamlabs = OAuth2Session(SL_CLIENT_ID, token=json.loads(preferences.ConfigSetting.streamlabs_access_token), auto_refresh_kwargs=extra, auto_refresh_url=SL_API_URL + '/token', token_updater=self.token_saver)
+        params = {
+                                      "type":"donation",
+                                      "image_href": "https://uploads.twitchalerts.com/000/000/121/467/1c05a5459e30802.gif",
+                                      "sound_href": "https://uploads.twitchalerts.com/000/000/121/467/pitrcade_coin_slot_quiet.ogg",
+                                      "message": "*Kara Arcade* Testing",
+                                      "user_message": "&nbsp;",
+                                      "duration": 5000,
+                                      "special_text_color": preferences.ConfigSetting.scoreboard_header_color,
+        }
+        response = streamlabs.post(SL_API_URL + '/alerts', data=params)
 
 
     @commands.command(name='save')
