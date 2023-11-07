@@ -12,9 +12,9 @@
   font-weight: 400;
   src: local('Press Start 2P Regular'),
        local('PressStart2P-Regular'),
-       url('{% static 'pitrcade/fonts/PressStart2P.woff2' %}') format('woff2'),
-       url('{% static 'pitrcade/fonts/PressStart2P.woff' %}') format('woff'),
-       url('{% static 'pitrcade/fonts/PressStart2P.ttf' %}') format('truetype');
+       url('{% static 'arcade/fonts/PressStart2P.woff2' %}') format('woff2'),
+       url('{% static 'arcade/fonts/PressStart2P.woff' %}') format('woff'),
+       url('{% static 'arcade/fonts/PressStart2P.ttf' %}') format('truetype');
 }
 h1 {
   color: {{ preferences.ConfigSetting.scoreboard_header_color }};
@@ -33,7 +33,7 @@ h3 {
   font-size: max(1.5vw, 15px);
 }
 </style>
-<link rel="stylesheet" type="text/css" href="{% static 'pitrcade/css/scoreboard.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'arcade/css/scoreboard.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -48,7 +48,7 @@ h3 {
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'pitrcade/js/typed/typed.min.js' %}"></script>
+<script src="{% static 'arcade/js/typed/typed.min.js' %}"></script>
 <script>
 function update_scoreboard(player_list, refresh_ms) {
     var high_scores_html = "";

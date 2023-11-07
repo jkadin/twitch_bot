@@ -79,7 +79,7 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         #Ignore messages from the bot
         if not message.author.name == self.nick.lower():
-            #Check for bits for Pitrcade
+            #Check for bits for arcade
             message_without_content = message.raw_data.split("PRIVMSG")[0]
             message_content = message.raw_data.split("PRIVMSG")[1].lower()
             matcher = re.search(r";bits=(?P<bits>\d+);", message_without_content)
@@ -120,7 +120,8 @@ class Bot(commands.Bot):
                             self.top_score = result['score']
                             await self.send(message.channel, f'{message.author.name} got the new high score of {self.top_score}!')
                     if streamlabs_failure:
-                        await self.send(message.channel, f'RIP Streamlabs: Some of {message.author.name}\'s arcade scores weren\'t displayed, but you can always check the arcade history to see how you did!')
+                        pass
+                        #await self.send(message.channel, f'RIP Streamlabs: Some of {message.author.name}\'s arcade scores weren\'t displayed, but you can always check the arcade history to see how you did!')
             if self.poll is not None and not message.content.startswith('!'):
                 for i, option in enumerate(self.poll['options'].keys()):
                     if message.content.lower() == option.lower() or message.content == str(i + 1):

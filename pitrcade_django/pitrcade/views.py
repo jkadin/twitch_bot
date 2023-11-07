@@ -63,7 +63,7 @@ class StreamlabsAuthView(generic.View):
         if os.getenv('DEBUG'):
             redirect_uri='http://127.0.0.1:8000/accounts/streamlabs/'
         else:
-            redirect_uri='https://pitrcade.justsals.com/accounts/streamlabs/'
+            redirect_uri='https://arcade.karastrait.com/accounts/streamlabs/'
         if not 'code' in request.GET:
             response_type='code'
             scope='alerts.create alerts.write donations.read donations.create'

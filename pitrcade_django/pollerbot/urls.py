@@ -19,7 +19,7 @@ from django.views.generic import RedirectView
 
 
 urlpatterns = [
-    path('pitrcade/', include('pitrcade.urls')),
+    path('arcade/', include('pitrcade.urls')),
     path('admin/', admin.site.urls),
     path('history/', RedirectView.as_view(pattern_name='pitrcade:history')),
     path('accounts/streamlabs/', RedirectView.as_view(query_string=True, pattern_name='pitrcade:streamlabs')),

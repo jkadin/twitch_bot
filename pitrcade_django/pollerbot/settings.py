@@ -34,10 +34,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
 
 ALLOWED_HOSTS = [
-    os.getenv('LOCAL_IP'),
-    os.getenv('LOCAL_HOSTNAME'),
-    'localhost',
-    '127.0.0.1',
+    '*',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -53,7 +50,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 LOGIN_REDIRECT_URL="/admin"
-LOGOUT_REDIRECT_URL="/pitrcade"
+LOGOUT_REDIRECT_URL="/arcade"
 
 
 
